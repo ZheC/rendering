@@ -19,6 +19,10 @@
 #include <vector>
 
 
+#define VERTEX_FILENAME "./input/with_texture.vert"
+#define FRAGMENT_FILENAME "./input/with_texture.frag"
+#define MODEL_FILENAME "./input/arc.obj"
+
 #define DELTA_ROT_X 20 // deg.
 #define DELTA_ROT_Y 20 // deg.
 #define DELTA_ROT_Z 10 // deg.
@@ -83,8 +87,8 @@ GLuint program, vertexShader, fragmentShader;
 // Shader Names
 //char *vertexFileName = "dirlightdiffambpix.vert";
 //char *fragmentFileName = "dirlightdiffambpix.frag";
-char *vertexFileName = "with_texture.vert";
-char *fragmentFileName = "with_texture.frag";
+//char *vertexFileName = "with_texture.vert";
+//char *fragmentFileName = "with_texture.frag";
 
 // Create an instance of the Importer class
 Assimp::Importer importer;
@@ -100,7 +104,7 @@ float scaleFactor;
 std::map<std::string, GLuint> textureIdMap;	
 
 // Replace the model name by your model's filename
-static const std::string modelname = "arc.obj";
+//static const std::string modelname = "arc.obj";
 
 // Camera Position
 float camX = 0, camY = 0, camZ = 5;
@@ -802,8 +806,8 @@ GLuint setupShaders() {
   v = glCreateShader(GL_VERTEX_SHADER);
   f = glCreateShader(GL_FRAGMENT_SHADER);
 
-  vs = textFileRead(vertexFileName);
-  fs = textFileRead(fragmentFileName);
+  vs = textFileRead( VERTEX_FILENAME );
+  fs = textFileRead( FRAGMENT_FILENAME );
 
   const char * vv = vs;
   const char * ff = fs;
@@ -851,7 +855,7 @@ GLuint setupShaders() {
 
 int init()					 
 {
-  if (!Import3DFromFile(modelname)) 
+  if (!Import3DFromFile( MODEL_FILENAME )) 
     return(0);
 
   LoadGLTextures(scene);
@@ -883,10 +887,15 @@ int init()
 // Main function
 
 int main(int argc, char **argv) {
-  printf ( "Delta rotation x, y, z (deg.): %d, %d, %d", DELTA_ROT_X, DELTA_ROT_Y, DELTA_ROT_Y );
-  printf( "Number of rotations: %d, %d, %d", NUM_ROT_X, NUM_ROT_Y, NUM_ROT_Z );
+  printf( "vertex, fragment, and model filenames: %s, %s, %s\n",\
+	  VERTEX_FILENAME, FRAGMENT_FILENAME, MODEL_FILENAME );
+
+  printf ( "Delta rotation x, y, z (deg.): %d, %d, %d\n",
+	   DELTA_ROT_X, DELTA_ROT_Y, DELTA_ROT_Y );
+  printf( "Number of rotations: %d, %d, %d\n",\
+	  NUM_ROT_X, NUM_ROT_Y, NUM_ROT_Z );
   // @todo figure out what angle ranges are covered with these param's (need to know start/stop conditions of code
-  printf ("Close graphics window to quit program\n" );
+  printf ("--> Close graphics window to quit program <--\n\n" );
 
   glutInit(&argc, argv);
 
