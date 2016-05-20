@@ -18,11 +18,12 @@
 #include <string>
 #include <vector>
 
-
+/// params for model
 #define VERTEX_FILENAME "./input/with_texture.vert"
 #define FRAGMENT_FILENAME "./input/with_texture.frag"
 #define MODEL_FILENAME "./input/arc.obj"
 
+/// params for render angles
 #define DELTA_ROT_X 20 // deg.
 #define DELTA_ROT_Y 20 // deg.
 #define DELTA_ROT_Z 10 // deg.
@@ -30,9 +31,17 @@
 #define NUM_ROT_Y 3 // in increments of DELTA_ROT_Y
 #define NUM_ROT_Z 36 // in increments of DELTA_ROT_Z
 
+/// params for projection matrix, image size, etc. in renders (more details on the whole process of rendering here: http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/)
+// FOV and RENDER_SIZE basically make up the camera focal length (radial distortion probably not bothered with)
+#define PROJ_MTX_HORIZONTAL_FOV 20.0f // as the FOV increases (or decreases), the object is further from (or closer to) the camera
+#define PROJ_MTX_NEAR_CLIP_PLANE 0.1f
+#define PROJ_MTX_FAR_CLIP_PLANE 100.0f
+#define RENDER_SIZE_WIDTH 180
+#define RENDER_SIZE_HEIGHT RENDER_SIZE_WIDTH 
+
 aiVector3D scene_min, scene_max, scene_center;
 
-// Information to render each assimp node
+/// Information to render each assimp node
 struct MyMesh{
 
   GLuint vao;
@@ -41,9 +50,10 @@ struct MyMesh{
   int numFaces;
 };
 
+///
 std::vector<struct MyMesh> myMeshes;
 
-// This is for a shader uniform block
+/// This is for a shader uniform block
 struct MyMaterial{
 
   float diffuse[4];
@@ -54,24 +64,24 @@ struct MyMaterial{
   int texCount;
 };
 
-// Model Matrix (part of the OpenGL Model View Matrix)
+/// Model Matrix (part of the OpenGL Model View Matrix)
 float modelMatrix[16];
 
-// For push and pop matrix
+/// For push and pop matrix
 std::vector<float *> matrixStack;
 
-// Vertex Attribute Locations
+/// Vertex Attribute Locations
 GLuint vertexLoc=0, normalLoc=1, texCoordLoc=2;
 
-// Uniform Bindings Points
+/// Uniform Bindings Points
 GLuint matricesUniLoc = 1, materialUniLoc = 2;
 
-// The sampler uniform for textured models
+/// The sampler uniform for textured models
 // we are assuming a single texture so this will
 //always be texture unit 0
 GLuint texUnit = 0;
 
-// Uniform Buffer for Matrices
+/// Uniform Buffer for Matrices
 // this buffer will contain 3 matrices: projection, view and model
 // each matrix is a float array with 16 components
 GLuint matricesUniBuffer;
@@ -81,7 +91,7 @@ GLuint matricesUniBuffer;
 #define ModelMatrixOffset sizeof(float) * 16 * 2
 #define MatrixSize sizeof(float) * 16
 
-// Program and Shader Identifiers
+/// Program and Shader Identifiers
 GLuint program, vertexShader, fragmentShader;
 
 // Shader Names
@@ -90,32 +100,34 @@ GLuint program, vertexShader, fragmentShader;
 //char *vertexFileName = "with_texture.vert";
 //char *fragmentFileName = "with_texture.frag";
 
-// Create an instance of the Importer class
+/// Create an instance of the Importer class
 Assimp::Importer importer;
 
-// the global Assimp scene object
+/// the global Assimp scene object
 const aiScene* scene = NULL;
 
-// scale factor for the model to fit in the window
+/// scale factor for the model to fit in the window
 float scaleFactor;
 
-// images / texture
+/// images / texture
 // map image filenames to textureIds pointer to texture Array
 std::map<std::string, GLuint> textureIdMap;	
 
 // Replace the model name by your model's filename
 //static const std::string modelname = "arc.obj";
 
-// Camera Position
+/// Camera Position
+/// @warning why is camZ fixed?
 float camX = 0, camY = 0, camZ = 5;
 
-// Mouse Tracking Variables
+/// Mouse Tracking Variables
 int startX, startY, tracking = 0;
 
-// Camera Spherical Coordinates
+/// Camera Spherical Coordinates
 float alpha = 0.0f, beta = 0.0f;
 float r = 5.0f;
 
+///
 static inline float 
 DegToRad(float degrees) 
 { 
@@ -125,14 +137,14 @@ DegToRad(float degrees)
 // ----------------------------------------------------
 // VECTOR STUFF
 
-// res = a cross b;
+/// res = a cross b;
 void crossProduct( float *a, float *b, float *res) {
   res[0] = a[1] * b[2]  -  b[1] * a[2];
   res[1] = a[2] * b[0]  -  b[2] * a[0];
   res[2] = a[0] * b[1]  -  b[0] * a[1];
 }
 
-// Normalize a vec3
+/// Normalize a vec3
 void normalize(float *a) {
   float mag = sqrt(a[0] * a[0]  +  a[1] * a[1]  +  a[2] * a[2]);
   a[0] /= mag;
@@ -143,7 +155,7 @@ void normalize(float *a) {
 // ----------------------------------------------------
 // MATRIX STUFF
 
-// Push and Pop for modelMatrix
+/// Push for modelMatrix
 void pushMatrix() {
 
   float *aux = (float *)malloc(sizeof(float) * 16);
@@ -151,6 +163,7 @@ void pushMatrix() {
   matrixStack.push_back(aux);
 }
 
+/// Pop for modelMatrix
 void popMatrix() {
 
   float *m = matrixStack[matrixStack.size()-1];
@@ -159,7 +172,7 @@ void popMatrix() {
   free(m);
 }
 
-// sets the square matrix mat to the identity matrix,
+/// sets the square matrix mat to the identity matrix,
 // size refers to the number of rows (or columns)
 void setIdentityMatrix( float *mat, int size) {
 
@@ -172,7 +185,7 @@ void setIdentityMatrix( float *mat, int size) {
     mat[i + i * size] = 1.0f;
 }
 
-// a = a * b;
+/// a = a * b;
 void multMatrix(float *a, float *b) {
 
   float res[16];
@@ -188,7 +201,7 @@ void multMatrix(float *a, float *b) {
   memcpy(a, res, 16 * sizeof(float));
 }
 
-// Defines a transformation matrix mat with a translation
+/// Defines a transformation matrix mat with a translation
 void setTranslationMatrix(float *mat, float x, float y, float z) {
 
   setIdentityMatrix(mat,4);
@@ -197,7 +210,7 @@ void setTranslationMatrix(float *mat, float x, float y, float z) {
   mat[14] = z;
 }
 
-// Defines a transformation matrix mat with a scale
+/// Defines a transformation matrix mat with a scale
 void setScaleMatrix(float *mat, float sx, float sy, float sz) {
 
   setIdentityMatrix(mat,4);
@@ -206,7 +219,7 @@ void setScaleMatrix(float *mat, float sx, float sy, float sz) {
   mat[10] = sz;
 }
 
-// Defines a transformation matrix mat with a rotation 
+/// Defines a transformation matrix mat with a rotation 
 // angle alpha and a rotation axis (x,y,z)
 void setRotationMatrix(float *mat, float angle, float x, float y, float z) {
 
@@ -239,16 +252,16 @@ void setRotationMatrix(float *mat, float angle, float x, float y, float z) {
 }
 
 // ----------------------------------------------------
-// Model Matrix 
-// Copies the modelMatrix to the uniform buffer
+/// Model Matrix 
 
+/// Copies the modelMatrix to the uniform buffer
 void setModelMatrix() {
   glBindBuffer(GL_UNIFORM_BUFFER,matricesUniBuffer);
   glBufferSubData(GL_UNIFORM_BUFFER,ModelMatrixOffset, MatrixSize, modelMatrix);
   glBindBuffer(GL_UNIFORM_BUFFER,0);
 }
 
-// The equivalent to glTranslate applied to the model matrix
+/// The equivalent to glTranslate applied to the model matrix
 void translate(float x, float y, float z) {
   float aux[16];
   setTranslationMatrix(aux,x,y,z);
@@ -256,7 +269,7 @@ void translate(float x, float y, float z) {
   setModelMatrix();
 }
 
-// The equivalent to glRotate applied to the model matrix
+/// The equivalent to glRotate applied to the model matrix
 void rotate(float angle, float x, float y, float z) {
   float aux[16];
   setRotationMatrix(aux,angle,x,y,z);
@@ -264,7 +277,7 @@ void rotate(float angle, float x, float y, float z) {
   setModelMatrix();
 }
 
-// The equivalent to glScale applied to the model matrix
+/// The equivalent to glScale applied to the model matrix
 void scale(float x, float y, float z) {
   float aux[16];
   setScaleMatrix(aux,x,y,z);
@@ -273,9 +286,9 @@ void scale(float x, float y, float z) {
 }
 
 // ----------------------------------------------------
-// Projection Matrix 
-// Computes the projection Matrix and stores it in the uniform buffer
+/// Projection Matrix 
 
+/// Computes the projection Matrix and stores it in the uniform buffer
 void buildProjectionMatrix(float fov, float ratio, float nearp, float farp) {
   float projMatrix[16];
   float f = 1.0f / tan (fov * (M_PI / 360.0f));
@@ -295,9 +308,9 @@ void buildProjectionMatrix(float fov, float ratio, float nearp, float farp) {
 }
 
 // ----------------------------------------------------
-// View Matrix
-// Computes the viewMatrix and stores it in the uniform buffer
+/// View Matrix
 
+/// Computes the viewMatrix and stores it in the uniform buffer
 void setCamera(float posX, float posY, float posZ, 
 	       float lookAtX, float lookAtY, float lookAtZ) {
 
@@ -351,10 +364,10 @@ void setCamera(float posX, float posY, float posZ,
 #define aisgl_min(x,y) (x<y?x:y)
 #define aisgl_max(x,y) (y>x?y:x)
 
+///
 void get_bounding_box_for_node (const aiNode* nd, 
 				aiVector3D* min, 
 				aiVector3D* max)
-	
 {
   aiMatrix4x4 prev;
   unsigned int n = 0, t;
@@ -380,7 +393,7 @@ void get_bounding_box_for_node (const aiNode* nd,
   }
 }
 
-
+///
 void get_bounding_box (aiVector3D* min, aiVector3D* max)
 {
 
@@ -389,6 +402,7 @@ void get_bounding_box (aiVector3D* min, aiVector3D* max)
   get_bounding_box_for_node(scene->mRootNode,min,max);
 }
 
+///
 bool Import3DFromFile( const std::string& pFile)
 {
   //check if file exists
@@ -431,6 +445,7 @@ bool Import3DFromFile( const std::string& pFile)
   return true;
 }
 
+///
 int LoadGLTextures(const aiScene* scene)
 {
   ILboolean success;
@@ -504,6 +519,7 @@ int LoadGLTextures(const aiScene* scene)
   return true;
 }
 
+///
 void set_float4(float f[4], float a, float b, float c, float d)
 {
   f[0] = a;
@@ -512,6 +528,7 @@ void set_float4(float f[4], float a, float b, float c, float d)
   f[3] = d;
 }
 
+///
 void color4_to_float4(const aiColor4D *c, float f[4])
 {
   f[0] = c->r;
@@ -520,7 +537,7 @@ void color4_to_float4(const aiColor4D *c, float f[4])
   f[3] = c->a;
 }
 
-
+///
 void genVAOsAndUniformBuffer(const aiScene *sc) {
 
   struct MyMesh aMesh;
@@ -646,8 +663,7 @@ void genVAOsAndUniformBuffer(const aiScene *sc) {
 }
 
 // ------------------------------------------------------------
-// Reshape Callback Function
-
+/// Reshape Callback Function
 void changeSize(int w, int h) {
 
   float ratio;
@@ -660,13 +676,16 @@ void changeSize(int w, int h) {
   glViewport(0, 0, w, h);
 
   ratio = (1.0f * w) / h;
-  buildProjectionMatrix(20.0f, ratio, 0.1f, 100.0f);
+  buildProjectionMatrix(PROJ_MTX_HORIZONTAL_FOV,\
+			ratio,\
+			PROJ_MTX_NEAR_CLIP_PLANE,\
+			PROJ_MTX_FAR_CLIP_PLANE);
 }
 
 // ------------------------------------------------------------
-// Render stuff
+/// Render stuff
 
-// Render Assimp Model
+/// Render Assimp Model
 void recursive_render (const aiScene *sc, const aiNode* nd)
 {
   // Get node transformation matrix
@@ -702,7 +721,7 @@ void recursive_render (const aiScene *sc, const aiNode* nd)
   popMatrix();
 }
 
-// Rendering Callback Function
+/// Rendering Callback Function
 void renderScene(void) {
 
   int i,j,k;
@@ -717,9 +736,8 @@ void renderScene(void) {
 	// set the model matrix to the identity Matrix
 	setIdentityMatrix(modelMatrix,4);
 	
-	// sets the model matrix to a scale matrix so that the model fits in the window
+	// sets the model matrix to a scale matrix so that the model fits in the window; scaleFactor is determined by looking at the size of the object and trying to fit the object in the window
 	scale(scaleFactor, scaleFactor, scaleFactor);
-	
 	
     	//rotate(90,0.f,0.f,1.f);
     	rotate(-90,1.f,0.f,0.f);
@@ -738,7 +756,7 @@ void renderScene(void) {
 	// swap buffers
 	glutSwapBuffers();
 
-	int w=180,h=180;	//save color image    
+	int w=RENDER_SIZE_WIDTH,h=RENDER_SIZE_HEIGHT;	//save color image    
 	char filename[50];
 	/*IplImage* src=cvCreateImage(cvSize(w,h), IPL_DEPTH_8U,1);   //save depth image
 	  glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -762,8 +780,9 @@ void renderScene(void) {
 }
 
 // --------------------------------------------------------
-// Shader Stuff
+/// Shader Stuff
 
+///
 void printShaderInfoLog(GLuint obj)
 {
   int infologLength = 0;
@@ -781,6 +800,7 @@ void printShaderInfoLog(GLuint obj)
     }
 }
 
+///
 void printProgramInfoLog(GLuint obj)
 {
   int infologLength = 0;
@@ -798,7 +818,7 @@ void printProgramInfoLog(GLuint obj)
     }
 }
 
-
+///
 GLuint setupShaders() {
   char *vs = NULL,*fs = NULL;
   GLuint p,v,f;
@@ -851,8 +871,9 @@ GLuint setupShaders() {
 }
 
 // ------------------------------------------------------------
-// Model loading and OpenGL setup
+/// Model loading and OpenGL setup
 
+///
 int init()					 
 {
   if (!Import3DFromFile( MODEL_FILENAME )) 
@@ -884,12 +905,10 @@ int init()
 }
 
 // ------------------------------------------------------------
-// Main function
-
+/// Main function
 int main(int argc, char **argv) {
   printf( "vertex, fragment, and model filenames: %s, %s, %s\n",\
 	  VERTEX_FILENAME, FRAGMENT_FILENAME, MODEL_FILENAME );
-
   printf ( "Delta rotation x, y, z (deg.): %d, %d, %d\n",
 	   DELTA_ROT_X, DELTA_ROT_Y, DELTA_ROT_Y );
   printf( "Number of rotations: %d, %d, %d\n",\
@@ -905,7 +924,7 @@ int main(int argc, char **argv) {
   glutInitContextFlags (GLUT_COMPATIBILITY_PROFILE );
 
   glutInitWindowPosition(100,100);
-  glutInitWindowSize(180,180);
+  glutInitWindowSize(RENDER_SIZE_WIDTH,RENDER_SIZE_HEIGHT);
   glutCreateWindow("Model");
 		
   //Callback Registration
