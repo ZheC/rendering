@@ -18,12 +18,23 @@
 #include <string>
 #include <vector>
 
-/// params for model
-#define VERTEX_FILENAME "./input/with_texture.vert"
+char gvar_vertex_fname[256];
+char gvar_fragment_fname[256];
+char gvar_model_fname[256];
+
+float gvar_delta_rot_x, gvar_delta_rot_y, gvar_delta_rot_z;
+int gvar_num_rot_x, gvar_num_rot_y, gvar_num_rot_z;
+
+float gvar_proj_mtx_horiz_fov;
+float gvar_proj_mtx_near_clip_plane, gvar_proj_mtx_far_clip_plane;
+int gvar_render_size_width, gvar_render_size_height;
+
+/// params for model -- default values below, can be overridden
+#define VERTEX_FILENAME "./input/with_texture.vert" // 
 #define FRAGMENT_FILENAME "./input/with_texture.frag"
 #define MODEL_FILENAME "./input/arc.obj"
 
-/// params for render angles
+/// params for render angles -- default values below, can be overridden
 #define DELTA_ROT_X 20 // deg.
 #define DELTA_ROT_Y 20 // deg.
 #define DELTA_ROT_Z 10 // deg.
@@ -676,10 +687,10 @@ void changeSize(int w, int h) {
   glViewport(0, 0, w, h);
 
   ratio = (1.0f * w) / h;
-  buildProjectionMatrix(PROJ_MTX_HORIZONTAL_FOV,\
+  buildProjectionMatrix(gvar_proj_mtx_horiz_fov,\
 			ratio,\
-			PROJ_MTX_NEAR_CLIP_PLANE,\
-			PROJ_MTX_FAR_CLIP_PLANE);
+			gvar_proj_mtx_near_clip_plane,\
+			gvar_proj_mtx_far_clip_plane);
 }
 
 // ------------------------------------------------------------
@@ -725,9 +736,9 @@ void recursive_render (const aiScene *sc, const aiNode* nd)
 void renderScene(void) {
 
   int i,j,k;
-  for(i=-1;i<NUM_ROT_X;i++){
-    for(j=0;j<NUM_ROT_Y;j++){
-      for(k=0;k<NUM_ROT_Z;k++){
+  for(i=-1;i<gvar_num_rot_x;i++){
+    for(j=0;j<gvar_num_rot_y;j++){
+      for(k=0;k<gvar_num_rot_z;k++){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set camera matrix
@@ -743,9 +754,9 @@ void renderScene(void) {
     	rotate(-90,1.f,0.f,0.f);
     	rotate(-90,0.f,0.f,1.f);
     
-	rotate(DELTA_ROT_X*i,1.f,0.f,0.f); // rotate it around the x axis	
-	rotate(DELTA_ROT_Y*j,0.f,1.f,0.f); // rotate it around the y axis
-	rotate(DELTA_ROT_Z*k,0.f,0.f,1.f); // rotate it around the z axis
+	rotate(gvar_delta_rot_x*i,1.f,0.f,0.f); // rotate it around the x axis	
+	rotate(gvar_delta_rot_y*j,0.f,1.f,0.f); // rotate it around the y axis
+	rotate(gvar_delta_rot_z*k,0.f,0.f,1.f); // rotate it around the z axis
 
 	// use our shader
 	glUseProgram(program);
@@ -756,7 +767,7 @@ void renderScene(void) {
 	// swap buffers
 	glutSwapBuffers();
 
-	int w=RENDER_SIZE_WIDTH,h=RENDER_SIZE_HEIGHT;	//save color image    
+	int w=gvar_render_size_width,h=gvar_render_size_height;	//save color image    
 	char filename[50];
 	/*IplImage* src=cvCreateImage(cvSize(w,h), IPL_DEPTH_8U,1);   //save depth image
 	  glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -826,8 +837,8 @@ GLuint setupShaders() {
   v = glCreateShader(GL_VERTEX_SHADER);
   f = glCreateShader(GL_FRAGMENT_SHADER);
 
-  vs = textFileRead( VERTEX_FILENAME );
-  fs = textFileRead( FRAGMENT_FILENAME );
+  vs = textFileRead( gvar_vertex_fname /*VERTEX_FILENAME*/ );
+  fs = textFileRead( gvar_fragment_fname /*FRAGMENT_FILENAME*/ );
 
   const char * vv = vs;
   const char * ff = fs;
@@ -876,7 +887,7 @@ GLuint setupShaders() {
 ///
 int init()					 
 {
-  if (!Import3DFromFile( MODEL_FILENAME )) 
+  if (!Import3DFromFile( gvar_model_fname /*MODEL_FILENAME*/ )) 
     return(0);
 
   LoadGLTextures(scene);
@@ -907,13 +918,36 @@ int init()
 // ------------------------------------------------------------
 /// Main function
 int main(int argc, char **argv) {
+  // default values
+  strcpy( gvar_vertex_fname, VERTEX_FILENAME );
+  strcpy( gvar_fragment_fname, FRAGMENT_FILENAME );
+  strcpy( gvar_model_fname, MODEL_FILENAME );
+
+  gvar_delta_rot_x = DELTA_ROT_X;
+  gvar_delta_rot_y = DELTA_ROT_Y;
+  gvar_delta_rot_z = DELTA_ROT_Z;
+  gvar_num_rot_x = NUM_ROT_X;
+  gvar_num_rot_y = NUM_ROT_Y;
+  gvar_num_rot_z = NUM_ROT_Z;
+
+  gvar_proj_mtx_horiz_fov = PROJ_MTX_HORIZONTAL_FOV;
+  gvar_proj_mtx_near_clip_plane = PROJ_MTX_NEAR_CLIP_PLANE;
+  gvar_proj_mtx_far_clip_plane = PROJ_MTX_FAR_CLIP_PLANE;
+  gvar_render_size_width = RENDER_SIZE_WIDTH;
+  gvar_render_size_height = RENDER_SIZE_HEIGHT;
+
+  // @todo take param's from cmd line or config file
+
   printf( "vertex, fragment, and model filenames: %s, %s, %s\n",\
-	  VERTEX_FILENAME, FRAGMENT_FILENAME, MODEL_FILENAME );
-  printf ( "Delta rotation x, y, z (deg.): %d, %d, %d\n",
-	   DELTA_ROT_X, DELTA_ROT_Y, DELTA_ROT_Y );
+	  gvar_vertex_fname, gvar_fragment_fname, gvar_model_fname );
+  printf ( "Delta rotation x, y, z (deg.): %.2g, %.2g, %.2g\n",
+	   gvar_delta_rot_x, gvar_delta_rot_y, gvar_delta_rot_z );
   printf( "Number of rotations: %d, %d, %d\n",\
-	  NUM_ROT_X, NUM_ROT_Y, NUM_ROT_Z );
-  // @todo figure out what angle ranges are covered with these param's (need to know start/stop conditions of code
+	  gvar_num_rot_x, gvar_num_rot_y, gvar_num_rot_z );
+  // @todo figure out what angle ranges are covered with these param's (need to know start/stop conditions of code)
+  printf( "Projection matrix horizontal FOV, near clip plane, and far clip plane; render size width, render size height: %.2g, %.2g, %.2g, %d, %d\n",\
+	  gvar_proj_mtx_horiz_fov, gvar_proj_mtx_near_clip_plane, gvar_proj_mtx_far_clip_plane, gvar_render_size_width, gvar_render_size_height);
+
   printf ("--> Close graphics window to quit program <--\n\n" );
 
   glutInit(&argc, argv);
@@ -924,7 +958,7 @@ int main(int argc, char **argv) {
   glutInitContextFlags (GLUT_COMPATIBILITY_PROFILE );
 
   glutInitWindowPosition(100,100);
-  glutInitWindowSize(RENDER_SIZE_WIDTH,RENDER_SIZE_HEIGHT);
+  glutInitWindowSize(gvar_render_size_width,gvar_render_size_height);
   glutCreateWindow("Model");
 		
   //Callback Registration
