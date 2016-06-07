@@ -39,7 +39,7 @@ int gvar_render_size_width, gvar_render_size_height;
 //#define MODEL_FILENAME "./input/14_MugCup_green.ply"
 //#define MODEL_FILENAME "./input/arc.obj" // this can be OBJ or PLY (may be others work as well)
 
-#define VERTEX_FILENAME "./input/with_texture.vert"
+#define VERTEX_FILENAME "./input/with_texture.vert" // these have to do w/ shading, etc. (not the actual object); more details here: http://stackoverflow.com/questions/6432838/what-is-the-correct-file-extension-for-glsl-shaders
 #define FRAGMENT_FILENAME "./input/with_texture.frag"
 
 /// params for render angles -- default values below, can be overridden
@@ -802,7 +802,7 @@ void renderScene(void) {
 	 j == gvar_num_rot_y &&
 	 k == gvar_num_rot_z ) {
       printf( "Exiting loop\n" );
-      throw 999;
+      throw 999; // Trick to exit glutMainLoop from https://www.opengl.org/discussion_boards/showthread.php/166643-how-to-come-out-from-glutMainLoop
       //exit(0);
     }
 
