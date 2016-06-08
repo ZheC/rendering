@@ -21,10 +21,12 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 char gvar_vertex_fname[256];
 char gvar_fragment_fname[256];
 char gvar_model_fname[256];
+char gvar_output_dir[256];
 
 float gvar_delta_rot_x, gvar_delta_rot_y, gvar_delta_rot_z;
 int gvar_num_rot_x, gvar_num_rot_y, gvar_num_rot_z;
@@ -38,6 +40,7 @@ int gvar_render_size_width, gvar_render_size_height;
 //#define MODEL_FILENAME "./input/19_Dish_bawl_rice.ply"
 //#define MODEL_FILENAME "./input/14_MugCup_green.ply"
 //#define MODEL_FILENAME "./input/arc.obj" // this can be OBJ or PLY (may be others work as well)
+#define OUTPUT_DIR "output"
 
 #define VERTEX_FILENAME "./input/with_texture.vert" // these have to do w/ shading, etc. (not the actual object); more details here: http://stackoverflow.com/questions/6432838/what-is-the-correct-file-extension-for-glsl-shaders
 #define FRAGMENT_FILENAME "./input/with_texture.frag"
@@ -743,8 +746,8 @@ void recursive_render (const aiScene *sc, const aiNode* nd)
 /// Rendering Callback Function
 void renderScene(void) {
 
-  int i,j,k;
-  for(i=-1;i<gvar_num_rot_x;i++){ // @todo, why does this start at -1 but others start at 0?  affects exit condition of loop
+  int i,j,k,ctr = 0;
+  for(i=0;i<gvar_num_rot_x;i++){ // @todo, why does this start at -1 but others start at 0?  affects exit condition of loop
     for(j=0;j<gvar_num_rot_y;j++){
       for(k=0;k<gvar_num_rot_z;k++){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -790,23 +793,29 @@ void renderScene(void) {
     	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
     	glReadPixels(0, 0, w, h, GL_BGR_EXT, GL_UNSIGNED_BYTE, img->imageData);
 	cvFlip(img, img, 0);	
-    	sprintf(filename, "./output/c_%02d_%02d_%02d.png",i+1,j,k);
+    	sprintf(filename, "./%s/c_%02d_%02d_%02d.png",gvar_output_dir,i+1,j,k);
 	cvSaveImage(filename,img);
-		
-      }
-    }
-
-    //printf( "i %d j %d k %d\n", i, j, k );
+    	sprintf(filename, "./%s/template%03d.png",gvar_output_dir,ctr++);
+	cvSaveImage(filename,img);		
+	if ( ( i == 0 && j == 0 && k == 0 ) ||\
+	     ( i == gvar_num_rot_x && j == gvar_num_rot_y && k == gvar_num_rot_z ) )
+	  printf( "Writing out render %s (this will only be shown for the first and last file)\n", filename );
     
+      }  // rof k
+
+    } // rof j
+
+    printf( "i %d j %d k %d\n", i, j, k );
+
     if ( i == gvar_num_rot_x-1 &&
 	 j == gvar_num_rot_y &&
 	 k == gvar_num_rot_z ) {
       printf( "Exiting loop\n" );
       throw 999; // Trick to exit glutMainLoop from https://www.opengl.org/discussion_boards/showthread.php/166643-how-to-come-out-from-glutMainLoop
       //exit(0);
-    }
+    } // fi i, j, k check
 
-  }
+  } // rof i
 
 }
 
@@ -942,6 +951,7 @@ int main(int argc, char **argv) {
   strcpy( gvar_vertex_fname, VERTEX_FILENAME );
   strcpy( gvar_fragment_fname, FRAGMENT_FILENAME );
   strcpy( gvar_model_fname, MODEL_FILENAME );
+  strcpy( gvar_output_dir, OUTPUT_DIR );
 
   gvar_delta_rot_x = DELTA_ROT_X;
   gvar_delta_rot_y = DELTA_ROT_Y;
@@ -956,16 +966,32 @@ int main(int argc, char **argv) {
   gvar_render_size_width = RENDER_SIZE_WIDTH;
   gvar_render_size_height = RENDER_SIZE_HEIGHT;
 
-  // @todo take param's from cmd line or config file
+  // take param's from cmd line
+  if ( argc < 4 ) {
+    std::cout << "usage: render <model_filename> <output_dir_of_renders>\n" \
+         << "         <delta_rot_x> <delta_rot_y> <delta_rot_z>\n"\
+         << "         <num_rot_x> <num_rot_y> <num_rot_z>\n"\
+         << "using default values\n\n";
+  }
+  else {
+    strcpy( gvar_model_fname, argv[1] );
+    strcpy( gvar_output_dir, argv[2] );
+    gvar_delta_rot_x = atof( argv[3] );
+    gvar_delta_rot_y = atof( argv[4] );
+    gvar_delta_rot_z = atof( argv[5] );
+    gvar_num_rot_x = atof( argv[6] );
+    gvar_num_rot_y = atof( argv[7] );
+    gvar_num_rot_z = atof( argv[8] );
+  }
 
-  printf( "vertex, fragment, and model filenames: %s, %s, %s\n",\
-	  gvar_vertex_fname, gvar_fragment_fname, gvar_model_fname );
+  printf( "Vertex, fragment, and model filenames; output dir.: %s, %s, %s; %s\n",\
+	  gvar_vertex_fname, gvar_fragment_fname, gvar_model_fname, gvar_output_dir );
   printf ( "Delta rotation x, y, z (deg.): %.2g, %.2g, %.2g\n",
 	   gvar_delta_rot_x, gvar_delta_rot_y, gvar_delta_rot_z );
   printf( "Number of rotations: %d, %d, %d\n",\
 	  gvar_num_rot_x, gvar_num_rot_y, gvar_num_rot_z );
   // @todo figure out what angle ranges are covered with these param's (need to know start/stop conditions of code)
-  printf( "Projection matrix horizontal FOV, near clip plane, and far clip plane; render size width, render size height: %.2g, %.2g, %.2g, %d, %d\n",\
+  printf( "Projection matrix horizontal FOV, near clip plane, and far clip plane; render size width, render size height: %.2g, %.2g, %.2g; %d, %d\n",\
 	  gvar_proj_mtx_horiz_fov, gvar_proj_mtx_near_clip_plane, gvar_proj_mtx_far_clip_plane, gvar_render_size_width, gvar_render_size_height);
 
   //printf ("--> Close graphics window to quit program <--\n\n" );
@@ -1002,7 +1028,7 @@ int main(int argc, char **argv) {
   printf ("Vendor: %s\n", glGetString (GL_VENDOR));
   printf ("Renderer: %s\n", glGetString (GL_RENDERER));
   printf ("Version: %s\n", glGetString (GL_VERSION));
-  printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+  printf ("GLSL: %s\n\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
   //return from main loop
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
@@ -1011,7 +1037,7 @@ int main(int argc, char **argv) {
   }
   catch(int n) {
     if ( n == 999 )
-      printf( "Finished; exiting\n" );
+      printf( "Finished; exiting; look at renders in %s\n", gvar_output_dir );
     else
       printf( "Unknown exception: %d", n );
   }
