@@ -5,18 +5,17 @@
 OBJ=tea_bottle
 CAD_FILENAME=17_Pet_bottle_pet_tea.obj
 
+# @todo, make sure ./render exists, ../vncc_train exists, etc.
 
 echo "################################################################################"
-echo rendering
+echo "rendering $CAD_FILENAME to output/$OBJ"
+echo "  renders will be copied to ../vncc_train/input/$OBJ (for training)"
+echo "  renders will be copied to ../realtime_vncc/models/$OBJ (for testing)"
 echo "################################################################################"
+# rendering
 mkdir -p output/$OBJ
 \rm -rf output/$OBJ/*
 ./render ./input/$CAD_FILENAME output/$OBJ   10 15  1   3  6  1 # Rx 15 Ry 10 Rz 0
-
-# testing which axis is which
-#./render ./input/$CAD_FILENAME output/$OBJ   90  1  1   2  1  1 # Rx 90
-#./render ./input/$CAD_FILENAME output/$OBJ    1 90  1   1  2  1 # Ry 90
-#./render ./input/$CAD_FILENAME output/$OBJ    1  1 90   1  1  2 # Rz 90
 
 # copy renders for training
 mkdir -p ../vncc_train/input/$OBJ
@@ -30,7 +29,8 @@ cp output/$OBJ/template*.* ../realtime_vncc/models/$OBJ
 
 # train
 echo "################################################################################"
-echo training
+echo "training ../vncc_train/input/$OBJ renders will be trained to ../vncc_train/output/$OBJ and made into ../vncc_train/pre/$OBJ.yaml"
+echo "  YAML file will be copied to ../realtime_vncc/pre"
 echo "################################################################################"
 cd ../vncc_train
 mkdir -p ../vncc_train/output/$OBJ
