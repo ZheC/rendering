@@ -1,0 +1,735 @@
+\hypertarget{model_8cu}{\section{model.\-cu File Reference}
+\label{model_8cu}\index{model.\-cu@{model.\-cu}}
+}
+{\ttfamily \#include $<$I\-L/il.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}textfile.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}assimp/\-Importer.\-hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}assimp/postprocess.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}assimp/scene.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}cv.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}highgui.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$G\-L/glew.\-h$>$}\\*
+{\ttfamily \#include $<$G\-L/freeglut.\-h$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$map$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structMyMesh}{My\-Mesh}
+\begin{DoxyCompactList}\small\item\em Information to render each assimp node. \end{DoxyCompactList}\item 
+struct \hyperlink{structMyMaterial}{My\-Material}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{model_8cu_a419f5a78dee2d2497fb46b8efe42876f}{V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}~\char`\"{}./input/with\-\_\-texture.\-vert\char`\"{}
+\begin{DoxyCompactList}\small\item\em params for model \end{DoxyCompactList}\item 
+\#define \hyperlink{model_8cu_a6977f7ba936717590383b04f05cedb3e}{F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}~\char`\"{}./input/with\-\_\-texture.\-frag\char`\"{}
+\item 
+\#define \hyperlink{model_8cu_a66aa9fddb93720ff711114a8a8ea5488}{M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}~\char`\"{}./input/arc.\-obj\char`\"{}
+\item 
+\#define \hyperlink{model_8cu_acc757458b126a47eb4d110b678a00b21}{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X}~20
+\begin{DoxyCompactList}\small\item\em params for render angles \end{DoxyCompactList}\item 
+\#define \hyperlink{model_8cu_a70e0404e32f48ba9400261da630621cb}{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y}~20
+\item 
+\#define \hyperlink{model_8cu_abdbf601c8a301eea2308c7c22144fac6}{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z}~10
+\item 
+\#define \hyperlink{model_8cu_a40a0dc5a222fe2b0dd35e6f905207218}{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X}~2
+\item 
+\#define \hyperlink{model_8cu_a427357debdba20990ea70ad96c9abc1f}{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y}~3
+\item 
+\#define \hyperlink{model_8cu_a58b414f04d228b95891ea4dd40cf9ccc}{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z}~36
+\item 
+\#define \hyperlink{model_8cu_a69cb816a14c6523874775c0f79226a77}{Matrices\-Uni\-Buffer\-Size}~sizeof(float) $\ast$ 16 $\ast$ 3
+\item 
+\#define \hyperlink{model_8cu_a8d10f38fead171e48c91cf41b2bdb829}{Proj\-Matrix\-Offset}~0
+\item 
+\#define \hyperlink{model_8cu_a2eff906dbc2a93745aca1c31a24ec41d}{View\-Matrix\-Offset}~sizeof(float) $\ast$ 16
+\item 
+\#define \hyperlink{model_8cu_aac8c26813c4941d80716173ee33e6b58}{Model\-Matrix\-Offset}~sizeof(float) $\ast$ 16 $\ast$ 2
+\item 
+\#define \hyperlink{model_8cu_a4eaa752a2bdb6b534fcc43fb1d73fd49}{Matrix\-Size}~sizeof(float) $\ast$ 16
+\item 
+\#define \hyperlink{model_8cu_ae19f66e94255e323687e3dcdd5362125}{aisgl\-\_\-min}(x, y)~(x$<$y?x\-:y)
+\item 
+\#define \hyperlink{model_8cu_a5d7d752ed7ce95f82f595ac2e5e300aa}{aisgl\-\_\-max}(x, y)~(y$>$x?y\-:x)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{model_8cu_a96f0bcc043e99751492999cad2331294}{cross\-Product} (float $\ast$a, float $\ast$b, float $\ast$res)
+\begin{DoxyCompactList}\small\item\em res = a cross b; \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_af265c7fe42c6561c1e009e1828e5df34}{normalize} (float $\ast$a)
+\begin{DoxyCompactList}\small\item\em Normalize a vec3. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_ae7c71faeeb4cab42687f7ed10c25e500}{push\-Matrix} ()
+\begin{DoxyCompactList}\small\item\em Push for model\-Matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a89162c73545bb184c781c825dd72f082}{pop\-Matrix} ()
+\begin{DoxyCompactList}\small\item\em Pop for model\-Matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_ab3e5ee415241ca2d35bcdb84b39dfa90}{set\-Identity\-Matrix} (float $\ast$mat, int size)
+\begin{DoxyCompactList}\small\item\em sets the square matrix mat to the identity matrix, \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a57427e9a54f840bbc82d719aa9762ab4}{mult\-Matrix} (float $\ast$a, float $\ast$b)
+\begin{DoxyCompactList}\small\item\em a = a $\ast$ b; \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a78d7c04718261e6caa38ff87be705787}{set\-Translation\-Matrix} (float $\ast$mat, float x, float y, float z)
+\begin{DoxyCompactList}\small\item\em Defines a transformation matrix mat with a translation. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a9705f0ad26d5379e263aeb4927950db8}{set\-Scale\-Matrix} (float $\ast$mat, float sx, float sy, float sz)
+\begin{DoxyCompactList}\small\item\em Defines a transformation matrix mat with a scale. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a8547e94c714309e7882a52566964b557}{set\-Rotation\-Matrix} (float $\ast$mat, float angle, float x, float y, float z)
+\begin{DoxyCompactList}\small\item\em Defines a transformation matrix mat with a rotation. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_ac4ba5a776bb9805306fec00fa0772259}{set\-Model\-Matrix} ()
+\begin{DoxyCompactList}\small\item\em Model Matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a9081ed23141a5980f028b21d58fa3290}{translate} (float x, float y, float z)
+\begin{DoxyCompactList}\small\item\em The equivalent to gl\-Translate applied to the model matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_ab3b8db7f0ed2eec710acf359c7be9967}{rotate} (float angle, float x, float y, float z)
+\begin{DoxyCompactList}\small\item\em The equivalent to gl\-Rotate applied to the model matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_ad6688b67f371ae87f750cbe01c904b67}{scale} (float x, float y, float z)
+\begin{DoxyCompactList}\small\item\em The equivalent to gl\-Scale applied to the model matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_aa46b1b84d330a69633de3893536fd2aa}{build\-Projection\-Matrix} (float fov, float ratio, float nearp, float farp)
+\begin{DoxyCompactList}\small\item\em Projection Matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a306a8190e29c6adc6e47c9c3b23cbfec}{set\-Camera} (float pos\-X, float pos\-Y, float pos\-Z, float look\-At\-X, float look\-At\-Y, float look\-At\-Z)
+\begin{DoxyCompactList}\small\item\em View Matrix. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a0fa53e006e46a19c09ddd85bd96092bd}{get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node} (const ai\-Node $\ast$nd, ai\-Vector3\-D $\ast$min, ai\-Vector3\-D $\ast$max)
+\item 
+void \hyperlink{model_8cu_a8f5b774db8e436e3654c9621c4b41874}{get\-\_\-bounding\-\_\-box} (ai\-Vector3\-D $\ast$min, ai\-Vector3\-D $\ast$max)
+\item 
+bool \hyperlink{model_8cu_a60b2175b933b3082dda62bf12fafa458}{Import3\-D\-From\-File} (const std\-::string \&p\-File)
+\item 
+int \hyperlink{model_8cu_aae09916d7c50132fd0830999049f3936}{Load\-G\-L\-Textures} (const ai\-Scene $\ast$\hyperlink{model_8cu_a7146d7f6682223a83b571071845d75e9}{scene})
+\item 
+void \hyperlink{model_8cu_a0a0e3b406aa4eab4670257833054df21}{set\-\_\-float4} (float f\mbox{[}4\mbox{]}, float a, float b, float c, float d)
+\item 
+void \hyperlink{model_8cu_ad0cbb7e78e2936c67729f2d70e2b2159}{color4\-\_\-to\-\_\-float4} (const ai\-Color4\-D $\ast$c, float f\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{model_8cu_ae70d02ac862e66e27e3166038bd9d94b}{gen\-V\-A\-Os\-And\-Uniform\-Buffer} (const ai\-Scene $\ast$sc)
+\item 
+void \hyperlink{model_8cu_a33e20b37682a0492a9e95d13bef17f02}{change\-Size} (int w, int h)
+\begin{DoxyCompactList}\small\item\em Reshape Callback Function. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a864fafd1dcefb67b0dec7c6b6b6f5c96}{recursive\-\_\-render} (const ai\-Scene $\ast$sc, const ai\-Node $\ast$nd)
+\begin{DoxyCompactList}\small\item\em Render stuff. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a2a96aed746d13d9b42d7888e156045f6}{render\-Scene} (void)
+\begin{DoxyCompactList}\small\item\em Rendering Callback Function. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a776b9402dbf22819c675dcd214f8bc90}{print\-Shader\-Info\-Log} (G\-Luint obj)
+\begin{DoxyCompactList}\small\item\em Shader Stuff. \end{DoxyCompactList}\item 
+void \hyperlink{model_8cu_a5012d81306e629e18157e5dd570163e1}{print\-Program\-Info\-Log} (G\-Luint obj)
+\item 
+G\-Luint \hyperlink{model_8cu_a16dffda163716a857e0e767d1f35d806}{setup\-Shaders} ()
+\item 
+int \hyperlink{model_8cu_a05848de25ac2dbec233935058a1d24b4}{init} ()
+\begin{DoxyCompactList}\small\item\em Model loading and Open\-G\-L setup. \end{DoxyCompactList}\item 
+int \hyperlink{model_8cu_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+ai\-Vector3\-D \hyperlink{model_8cu_a52c5663b71d3f45942f9dabf61485686}{scene\-\_\-min}
+\item 
+ai\-Vector3\-D \hyperlink{model_8cu_a0778234d487fcc70e8cd289ac0322799}{scene\-\_\-max}
+\item 
+ai\-Vector3\-D \hyperlink{model_8cu_ab6d811204eda46a18e0d5cb6182521d9}{scene\-\_\-center}
+\item 
+std\-::vector$<$ struct \hyperlink{structMyMesh}{My\-Mesh} $>$ \hyperlink{model_8cu_a6c07ad8099da4a08eb875a7a2f98e5c1}{my\-Meshes}
+\item 
+float \hyperlink{model_8cu_a3172941d9cdfe886976ac7aca79bdd38}{model\-Matrix} \mbox{[}16\mbox{]}
+\begin{DoxyCompactList}\small\item\em Model Matrix (part of the Open\-G\-L Model View Matrix) \end{DoxyCompactList}\item 
+std\-::vector$<$ float $\ast$ $>$ \hyperlink{model_8cu_a2d79b97202d353b8484d554d4eec887a}{matrix\-Stack}
+\begin{DoxyCompactList}\small\item\em For push and pop matrix. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_a5711328d3ae0b85040c6b5ab7a068938}{vertex\-Loc} =0
+\begin{DoxyCompactList}\small\item\em Vertex Attribute Locations. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_a56e36f00ac5f661588ac29611cfce147}{normal\-Loc} =1
+\item 
+G\-Luint \hyperlink{model_8cu_a1a017d1373ae220b4ec413d55eebf11c}{tex\-Coord\-Loc} =2
+\item 
+G\-Luint \hyperlink{model_8cu_ac02c3eda5bd826029d27c463d16e2e9d}{matrices\-Uni\-Loc} = 1
+\begin{DoxyCompactList}\small\item\em Uniform Bindings Points. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_a4da0b71259cea0b7a2fa5d47c9a33061}{material\-Uni\-Loc} = 2
+\item 
+G\-Luint \hyperlink{model_8cu_a97e30e3db0b913943abcd0dc575ace53}{tex\-Unit} = 0
+\begin{DoxyCompactList}\small\item\em The sampler uniform for textured models. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_a9d18a0bfeca34c0908d4383cff3506d1}{matrices\-Uni\-Buffer}
+\begin{DoxyCompactList}\small\item\em Uniform Buffer for Matrices. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_a27d8510c93324412d38a888eddee2852}{program}
+\begin{DoxyCompactList}\small\item\em Program and Shader Identifiers. \end{DoxyCompactList}\item 
+G\-Luint \hyperlink{model_8cu_aff4cf7548dc507a02192ad289d424873}{vertex\-Shader}
+\item 
+G\-Luint \hyperlink{model_8cu_ac6199bad53ba5a784194f0d6a86a1758}{fragment\-Shader}
+\item 
+Assimp\-::\-Importer \hyperlink{model_8cu_acc60f07ef610a395e60c056a6ceac291}{importer}
+\begin{DoxyCompactList}\small\item\em Create an instance of the Importer class. \end{DoxyCompactList}\item 
+const ai\-Scene $\ast$ \hyperlink{model_8cu_a7146d7f6682223a83b571071845d75e9}{scene} = N\-U\-L\-L
+\begin{DoxyCompactList}\small\item\em the global Assimp scene object \end{DoxyCompactList}\item 
+float \hyperlink{model_8cu_a8030f24154c0e29bcbdf9a153804f214}{scale\-Factor}
+\begin{DoxyCompactList}\small\item\em scale factor for the model to fit in the window \end{DoxyCompactList}\item 
+std\-::map$<$ std\-::string, G\-Luint $>$ \hyperlink{model_8cu_a531fe6af3b950c3a770ea91117a9b24f}{texture\-Id\-Map}
+\begin{DoxyCompactList}\small\item\em images / texture \end{DoxyCompactList}\item 
+float \hyperlink{model_8cu_a1db86c8e9928093303bdc04e7005232d}{cam\-X} = 0
+\begin{DoxyCompactList}\small\item\em Camera Position. \end{DoxyCompactList}\item 
+float \hyperlink{model_8cu_a1b9c52c561e9ba676e2302e9a76a1f0b}{cam\-Y} = 0
+\item 
+float \hyperlink{model_8cu_a174bd67f2d4b25dfc51589d53dc84c9e}{cam\-Z} = 5
+\item 
+int \hyperlink{model_8cu_a85da7669cabd63b0459f1335886dbf2e}{start\-X}
+\begin{DoxyCompactList}\small\item\em Mouse Tracking Variables. \end{DoxyCompactList}\item 
+int \hyperlink{model_8cu_a7fd8d76428f3da6360d3219bb2b9673a}{start\-Y}
+\item 
+int \hyperlink{model_8cu_af140661d5ce1ea88b9a8b74bca0a2b6e}{tracking} = 0
+\item 
+float \hyperlink{model_8cu_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha} = 0.\-0f
+\begin{DoxyCompactList}\small\item\em Camera Spherical Coordinates. \end{DoxyCompactList}\item 
+float \hyperlink{model_8cu_aa773d9a6c0ccefaa0fc9ab66fec68ec1}{beta} = 0.\-0f
+\item 
+float \hyperlink{model_8cu_a4788d82c901b9367dd5c0daff8a7616b}{r} = 5.\-0f
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{model_8cu_a5d7d752ed7ce95f82f595ac2e5e300aa}{\index{model.\-cu@{model.\-cu}!aisgl\-\_\-max@{aisgl\-\_\-max}}
+\index{aisgl\-\_\-max@{aisgl\-\_\-max}!model.cu@{model.\-cu}}
+\subsubsection[{aisgl\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}\#define aisgl\-\_\-max(
+\begin{DoxyParamCaption}
+\item[{}]{x, }
+\item[{}]{y}
+\end{DoxyParamCaption}
+)~(y$>$x?y\-:x)}}\label{model_8cu_a5d7d752ed7ce95f82f595ac2e5e300aa}
+\hypertarget{model_8cu_ae19f66e94255e323687e3dcdd5362125}{\index{model.\-cu@{model.\-cu}!aisgl\-\_\-min@{aisgl\-\_\-min}}
+\index{aisgl\-\_\-min@{aisgl\-\_\-min}!model.cu@{model.\-cu}}
+\subsubsection[{aisgl\-\_\-min}]{\setlength{\rightskip}{0pt plus 5cm}\#define aisgl\-\_\-min(
+\begin{DoxyParamCaption}
+\item[{}]{x, }
+\item[{}]{y}
+\end{DoxyParamCaption}
+)~(x$<$y?x\-:y)}}\label{model_8cu_ae19f66e94255e323687e3dcdd5362125}
+\hypertarget{model_8cu_acc757458b126a47eb4d110b678a00b21}{\index{model.\-cu@{model.\-cu}!D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X}}
+\index{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X}!model.cu@{model.\-cu}}
+\subsubsection[{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-X~20}}\label{model_8cu_acc757458b126a47eb4d110b678a00b21}
+
+
+params for render angles 
+
+\hypertarget{model_8cu_a70e0404e32f48ba9400261da630621cb}{\index{model.\-cu@{model.\-cu}!D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y}}
+\index{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y}!model.cu@{model.\-cu}}
+\subsubsection[{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Y~20}}\label{model_8cu_a70e0404e32f48ba9400261da630621cb}
+\hypertarget{model_8cu_abdbf601c8a301eea2308c7c22144fac6}{\index{model.\-cu@{model.\-cu}!D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z}}
+\index{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z@{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z}!model.cu@{model.\-cu}}
+\subsubsection[{D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-L\-T\-A\-\_\-\-R\-O\-T\-\_\-\-Z~10}}\label{model_8cu_abdbf601c8a301eea2308c7c22144fac6}
+\hypertarget{model_8cu_a6977f7ba936717590383b04f05cedb3e}{\index{model.\-cu@{model.\-cu}!F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}}
+\index{F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}!model.cu@{model.\-cu}}
+\subsubsection[{F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\-R\-A\-G\-M\-E\-N\-T\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E~\char`\"{}./input/with\-\_\-texture.\-frag\char`\"{}}}\label{model_8cu_a6977f7ba936717590383b04f05cedb3e}
+\hypertarget{model_8cu_a69cb816a14c6523874775c0f79226a77}{\index{model.\-cu@{model.\-cu}!Matrices\-Uni\-Buffer\-Size@{Matrices\-Uni\-Buffer\-Size}}
+\index{Matrices\-Uni\-Buffer\-Size@{Matrices\-Uni\-Buffer\-Size}!model.cu@{model.\-cu}}
+\subsubsection[{Matrices\-Uni\-Buffer\-Size}]{\setlength{\rightskip}{0pt plus 5cm}\#define Matrices\-Uni\-Buffer\-Size~sizeof(float) $\ast$ 16 $\ast$ 3}}\label{model_8cu_a69cb816a14c6523874775c0f79226a77}
+\hypertarget{model_8cu_a4eaa752a2bdb6b534fcc43fb1d73fd49}{\index{model.\-cu@{model.\-cu}!Matrix\-Size@{Matrix\-Size}}
+\index{Matrix\-Size@{Matrix\-Size}!model.cu@{model.\-cu}}
+\subsubsection[{Matrix\-Size}]{\setlength{\rightskip}{0pt plus 5cm}\#define Matrix\-Size~sizeof(float) $\ast$ 16}}\label{model_8cu_a4eaa752a2bdb6b534fcc43fb1d73fd49}
+\hypertarget{model_8cu_a66aa9fddb93720ff711114a8a8ea5488}{\index{model.\-cu@{model.\-cu}!M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}}
+\index{M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}!model.cu@{model.\-cu}}
+\subsubsection[{M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-O\-D\-E\-L\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E~\char`\"{}./input/arc.\-obj\char`\"{}}}\label{model_8cu_a66aa9fddb93720ff711114a8a8ea5488}
+\hypertarget{model_8cu_aac8c26813c4941d80716173ee33e6b58}{\index{model.\-cu@{model.\-cu}!Model\-Matrix\-Offset@{Model\-Matrix\-Offset}}
+\index{Model\-Matrix\-Offset@{Model\-Matrix\-Offset}!model.cu@{model.\-cu}}
+\subsubsection[{Model\-Matrix\-Offset}]{\setlength{\rightskip}{0pt plus 5cm}\#define Model\-Matrix\-Offset~sizeof(float) $\ast$ 16 $\ast$ 2}}\label{model_8cu_aac8c26813c4941d80716173ee33e6b58}
+\hypertarget{model_8cu_a40a0dc5a222fe2b0dd35e6f905207218}{\index{model.\-cu@{model.\-cu}!N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X}}
+\index{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X}!model.cu@{model.\-cu}}
+\subsubsection[{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-X~2}}\label{model_8cu_a40a0dc5a222fe2b0dd35e6f905207218}
+\hypertarget{model_8cu_a427357debdba20990ea70ad96c9abc1f}{\index{model.\-cu@{model.\-cu}!N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y}}
+\index{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y}!model.cu@{model.\-cu}}
+\subsubsection[{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Y~3}}\label{model_8cu_a427357debdba20990ea70ad96c9abc1f}
+\hypertarget{model_8cu_a58b414f04d228b95891ea4dd40cf9ccc}{\index{model.\-cu@{model.\-cu}!N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z}}
+\index{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z@{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z}!model.cu@{model.\-cu}}
+\subsubsection[{N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-\_\-\-R\-O\-T\-\_\-\-Z~36}}\label{model_8cu_a58b414f04d228b95891ea4dd40cf9ccc}
+\hypertarget{model_8cu_a8d10f38fead171e48c91cf41b2bdb829}{\index{model.\-cu@{model.\-cu}!Proj\-Matrix\-Offset@{Proj\-Matrix\-Offset}}
+\index{Proj\-Matrix\-Offset@{Proj\-Matrix\-Offset}!model.cu@{model.\-cu}}
+\subsubsection[{Proj\-Matrix\-Offset}]{\setlength{\rightskip}{0pt plus 5cm}\#define Proj\-Matrix\-Offset~0}}\label{model_8cu_a8d10f38fead171e48c91cf41b2bdb829}
+\hypertarget{model_8cu_a419f5a78dee2d2497fb46b8efe42876f}{\index{model.\-cu@{model.\-cu}!V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}}
+\index{V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E@{V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}!model.cu@{model.\-cu}}
+\subsubsection[{V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\-E\-R\-T\-E\-X\-\_\-\-F\-I\-L\-E\-N\-A\-M\-E~\char`\"{}./input/with\-\_\-texture.\-vert\char`\"{}}}\label{model_8cu_a419f5a78dee2d2497fb46b8efe42876f}
+
+
+params for model 
+
+\hypertarget{model_8cu_a2eff906dbc2a93745aca1c31a24ec41d}{\index{model.\-cu@{model.\-cu}!View\-Matrix\-Offset@{View\-Matrix\-Offset}}
+\index{View\-Matrix\-Offset@{View\-Matrix\-Offset}!model.cu@{model.\-cu}}
+\subsubsection[{View\-Matrix\-Offset}]{\setlength{\rightskip}{0pt plus 5cm}\#define View\-Matrix\-Offset~sizeof(float) $\ast$ 16}}\label{model_8cu_a2eff906dbc2a93745aca1c31a24ec41d}
+
+
+\subsection{Function Documentation}
+\hypertarget{model_8cu_aa46b1b84d330a69633de3893536fd2aa}{\index{model.\-cu@{model.\-cu}!build\-Projection\-Matrix@{build\-Projection\-Matrix}}
+\index{build\-Projection\-Matrix@{build\-Projection\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{build\-Projection\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void build\-Projection\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float}]{fov, }
+\item[{float}]{ratio, }
+\item[{float}]{nearp, }
+\item[{float}]{farp}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_aa46b1b84d330a69633de3893536fd2aa}
+
+
+Projection Matrix. 
+
+Computes the projection Matrix and stores it in the uniform buffer \hypertarget{model_8cu_a33e20b37682a0492a9e95d13bef17f02}{\index{model.\-cu@{model.\-cu}!change\-Size@{change\-Size}}
+\index{change\-Size@{change\-Size}!model.cu@{model.\-cu}}
+\subsubsection[{change\-Size}]{\setlength{\rightskip}{0pt plus 5cm}void change\-Size (
+\begin{DoxyParamCaption}
+\item[{int}]{w, }
+\item[{int}]{h}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a33e20b37682a0492a9e95d13bef17f02}
+
+
+Reshape Callback Function. 
+
+\hypertarget{model_8cu_ad0cbb7e78e2936c67729f2d70e2b2159}{\index{model.\-cu@{model.\-cu}!color4\-\_\-to\-\_\-float4@{color4\-\_\-to\-\_\-float4}}
+\index{color4\-\_\-to\-\_\-float4@{color4\-\_\-to\-\_\-float4}!model.cu@{model.\-cu}}
+\subsubsection[{color4\-\_\-to\-\_\-float4}]{\setlength{\rightskip}{0pt plus 5cm}void color4\-\_\-to\-\_\-float4 (
+\begin{DoxyParamCaption}
+\item[{const ai\-Color4\-D $\ast$}]{c, }
+\item[{float}]{f\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ad0cbb7e78e2936c67729f2d70e2b2159}
+\hypertarget{model_8cu_a96f0bcc043e99751492999cad2331294}{\index{model.\-cu@{model.\-cu}!cross\-Product@{cross\-Product}}
+\index{cross\-Product@{cross\-Product}!model.cu@{model.\-cu}}
+\subsubsection[{cross\-Product}]{\setlength{\rightskip}{0pt plus 5cm}void cross\-Product (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{a, }
+\item[{float $\ast$}]{b, }
+\item[{float $\ast$}]{res}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a96f0bcc043e99751492999cad2331294}
+
+
+res = a cross b; 
+
+\hypertarget{model_8cu_ae70d02ac862e66e27e3166038bd9d94b}{\index{model.\-cu@{model.\-cu}!gen\-V\-A\-Os\-And\-Uniform\-Buffer@{gen\-V\-A\-Os\-And\-Uniform\-Buffer}}
+\index{gen\-V\-A\-Os\-And\-Uniform\-Buffer@{gen\-V\-A\-Os\-And\-Uniform\-Buffer}!model.cu@{model.\-cu}}
+\subsubsection[{gen\-V\-A\-Os\-And\-Uniform\-Buffer}]{\setlength{\rightskip}{0pt plus 5cm}void gen\-V\-A\-Os\-And\-Uniform\-Buffer (
+\begin{DoxyParamCaption}
+\item[{const ai\-Scene $\ast$}]{sc}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ae70d02ac862e66e27e3166038bd9d94b}
+\hypertarget{model_8cu_a8f5b774db8e436e3654c9621c4b41874}{\index{model.\-cu@{model.\-cu}!get\-\_\-bounding\-\_\-box@{get\-\_\-bounding\-\_\-box}}
+\index{get\-\_\-bounding\-\_\-box@{get\-\_\-bounding\-\_\-box}!model.cu@{model.\-cu}}
+\subsubsection[{get\-\_\-bounding\-\_\-box}]{\setlength{\rightskip}{0pt plus 5cm}void get\-\_\-bounding\-\_\-box (
+\begin{DoxyParamCaption}
+\item[{ai\-Vector3\-D $\ast$}]{min, }
+\item[{ai\-Vector3\-D $\ast$}]{max}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a8f5b774db8e436e3654c9621c4b41874}
+\hypertarget{model_8cu_a0fa53e006e46a19c09ddd85bd96092bd}{\index{model.\-cu@{model.\-cu}!get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node@{get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node}}
+\index{get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node@{get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node}!model.cu@{model.\-cu}}
+\subsubsection[{get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node}]{\setlength{\rightskip}{0pt plus 5cm}void get\-\_\-bounding\-\_\-box\-\_\-for\-\_\-node (
+\begin{DoxyParamCaption}
+\item[{const ai\-Node $\ast$}]{nd, }
+\item[{ai\-Vector3\-D $\ast$}]{min, }
+\item[{ai\-Vector3\-D $\ast$}]{max}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a0fa53e006e46a19c09ddd85bd96092bd}
+\hypertarget{model_8cu_a60b2175b933b3082dda62bf12fafa458}{\index{model.\-cu@{model.\-cu}!Import3\-D\-From\-File@{Import3\-D\-From\-File}}
+\index{Import3\-D\-From\-File@{Import3\-D\-From\-File}!model.cu@{model.\-cu}}
+\subsubsection[{Import3\-D\-From\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool Import3\-D\-From\-File (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{p\-File}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a60b2175b933b3082dda62bf12fafa458}
+\hypertarget{model_8cu_a05848de25ac2dbec233935058a1d24b4}{\index{model.\-cu@{model.\-cu}!init@{init}}
+\index{init@{init}!model.cu@{model.\-cu}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}int init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a05848de25ac2dbec233935058a1d24b4}
+
+
+Model loading and Open\-G\-L setup. 
+
+\hypertarget{model_8cu_aae09916d7c50132fd0830999049f3936}{\index{model.\-cu@{model.\-cu}!Load\-G\-L\-Textures@{Load\-G\-L\-Textures}}
+\index{Load\-G\-L\-Textures@{Load\-G\-L\-Textures}!model.cu@{model.\-cu}}
+\subsubsection[{Load\-G\-L\-Textures}]{\setlength{\rightskip}{0pt plus 5cm}int Load\-G\-L\-Textures (
+\begin{DoxyParamCaption}
+\item[{const ai\-Scene $\ast$}]{scene}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_aae09916d7c50132fd0830999049f3936}
+\hypertarget{model_8cu_a3c04138a5bfe5d72780bb7e82a18e627}{\index{model.\-cu@{model.\-cu}!main@{main}}
+\index{main@{main}!model.cu@{model.\-cu}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a3c04138a5bfe5d72780bb7e82a18e627}
+
+
+Main function. 
+
+\hypertarget{model_8cu_a57427e9a54f840bbc82d719aa9762ab4}{\index{model.\-cu@{model.\-cu}!mult\-Matrix@{mult\-Matrix}}
+\index{mult\-Matrix@{mult\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{mult\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void mult\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{a, }
+\item[{float $\ast$}]{b}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a57427e9a54f840bbc82d719aa9762ab4}
+
+
+a = a $\ast$ b; 
+
+\hypertarget{model_8cu_af265c7fe42c6561c1e009e1828e5df34}{\index{model.\-cu@{model.\-cu}!normalize@{normalize}}
+\index{normalize@{normalize}!model.cu@{model.\-cu}}
+\subsubsection[{normalize}]{\setlength{\rightskip}{0pt plus 5cm}void normalize (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{a}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_af265c7fe42c6561c1e009e1828e5df34}
+
+
+Normalize a vec3. 
+
+\hypertarget{model_8cu_a89162c73545bb184c781c825dd72f082}{\index{model.\-cu@{model.\-cu}!pop\-Matrix@{pop\-Matrix}}
+\index{pop\-Matrix@{pop\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{pop\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void pop\-Matrix (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a89162c73545bb184c781c825dd72f082}
+
+
+Pop for model\-Matrix. 
+
+\hypertarget{model_8cu_a5012d81306e629e18157e5dd570163e1}{\index{model.\-cu@{model.\-cu}!print\-Program\-Info\-Log@{print\-Program\-Info\-Log}}
+\index{print\-Program\-Info\-Log@{print\-Program\-Info\-Log}!model.cu@{model.\-cu}}
+\subsubsection[{print\-Program\-Info\-Log}]{\setlength{\rightskip}{0pt plus 5cm}void print\-Program\-Info\-Log (
+\begin{DoxyParamCaption}
+\item[{G\-Luint}]{obj}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a5012d81306e629e18157e5dd570163e1}
+\hypertarget{model_8cu_a776b9402dbf22819c675dcd214f8bc90}{\index{model.\-cu@{model.\-cu}!print\-Shader\-Info\-Log@{print\-Shader\-Info\-Log}}
+\index{print\-Shader\-Info\-Log@{print\-Shader\-Info\-Log}!model.cu@{model.\-cu}}
+\subsubsection[{print\-Shader\-Info\-Log}]{\setlength{\rightskip}{0pt plus 5cm}void print\-Shader\-Info\-Log (
+\begin{DoxyParamCaption}
+\item[{G\-Luint}]{obj}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a776b9402dbf22819c675dcd214f8bc90}
+
+
+Shader Stuff. 
+
+\hypertarget{model_8cu_ae7c71faeeb4cab42687f7ed10c25e500}{\index{model.\-cu@{model.\-cu}!push\-Matrix@{push\-Matrix}}
+\index{push\-Matrix@{push\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{push\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void push\-Matrix (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ae7c71faeeb4cab42687f7ed10c25e500}
+
+
+Push for model\-Matrix. 
+
+\hypertarget{model_8cu_a864fafd1dcefb67b0dec7c6b6b6f5c96}{\index{model.\-cu@{model.\-cu}!recursive\-\_\-render@{recursive\-\_\-render}}
+\index{recursive\-\_\-render@{recursive\-\_\-render}!model.cu@{model.\-cu}}
+\subsubsection[{recursive\-\_\-render}]{\setlength{\rightskip}{0pt plus 5cm}void recursive\-\_\-render (
+\begin{DoxyParamCaption}
+\item[{const ai\-Scene $\ast$}]{sc, }
+\item[{const ai\-Node $\ast$}]{nd}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a864fafd1dcefb67b0dec7c6b6b6f5c96}
+
+
+Render stuff. 
+
+Render Assimp Model \hypertarget{model_8cu_a2a96aed746d13d9b42d7888e156045f6}{\index{model.\-cu@{model.\-cu}!render\-Scene@{render\-Scene}}
+\index{render\-Scene@{render\-Scene}!model.cu@{model.\-cu}}
+\subsubsection[{render\-Scene}]{\setlength{\rightskip}{0pt plus 5cm}void render\-Scene (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a2a96aed746d13d9b42d7888e156045f6}
+
+
+Rendering Callback Function. 
+
+\hypertarget{model_8cu_ab3b8db7f0ed2eec710acf359c7be9967}{\index{model.\-cu@{model.\-cu}!rotate@{rotate}}
+\index{rotate@{rotate}!model.cu@{model.\-cu}}
+\subsubsection[{rotate}]{\setlength{\rightskip}{0pt plus 5cm}void rotate (
+\begin{DoxyParamCaption}
+\item[{float}]{angle, }
+\item[{float}]{x, }
+\item[{float}]{y, }
+\item[{float}]{z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ab3b8db7f0ed2eec710acf359c7be9967}
+
+
+The equivalent to gl\-Rotate applied to the model matrix. 
+
+\hypertarget{model_8cu_ad6688b67f371ae87f750cbe01c904b67}{\index{model.\-cu@{model.\-cu}!scale@{scale}}
+\index{scale@{scale}!model.cu@{model.\-cu}}
+\subsubsection[{scale}]{\setlength{\rightskip}{0pt plus 5cm}void scale (
+\begin{DoxyParamCaption}
+\item[{float}]{x, }
+\item[{float}]{y, }
+\item[{float}]{z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ad6688b67f371ae87f750cbe01c904b67}
+
+
+The equivalent to gl\-Scale applied to the model matrix. 
+
+\hypertarget{model_8cu_a0a0e3b406aa4eab4670257833054df21}{\index{model.\-cu@{model.\-cu}!set\-\_\-float4@{set\-\_\-float4}}
+\index{set\-\_\-float4@{set\-\_\-float4}!model.cu@{model.\-cu}}
+\subsubsection[{set\-\_\-float4}]{\setlength{\rightskip}{0pt plus 5cm}void set\-\_\-float4 (
+\begin{DoxyParamCaption}
+\item[{float}]{f\mbox{[}4\mbox{]}, }
+\item[{float}]{a, }
+\item[{float}]{b, }
+\item[{float}]{c, }
+\item[{float}]{d}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a0a0e3b406aa4eab4670257833054df21}
+\hypertarget{model_8cu_a306a8190e29c6adc6e47c9c3b23cbfec}{\index{model.\-cu@{model.\-cu}!set\-Camera@{set\-Camera}}
+\index{set\-Camera@{set\-Camera}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Camera}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Camera (
+\begin{DoxyParamCaption}
+\item[{float}]{pos\-X, }
+\item[{float}]{pos\-Y, }
+\item[{float}]{pos\-Z, }
+\item[{float}]{look\-At\-X, }
+\item[{float}]{look\-At\-Y, }
+\item[{float}]{look\-At\-Z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a306a8190e29c6adc6e47c9c3b23cbfec}
+
+
+View Matrix. 
+
+Computes the view\-Matrix and stores it in the uniform buffer \hypertarget{model_8cu_ab3e5ee415241ca2d35bcdb84b39dfa90}{\index{model.\-cu@{model.\-cu}!set\-Identity\-Matrix@{set\-Identity\-Matrix}}
+\index{set\-Identity\-Matrix@{set\-Identity\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Identity\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Identity\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{mat, }
+\item[{int}]{size}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ab3e5ee415241ca2d35bcdb84b39dfa90}
+
+
+sets the square matrix mat to the identity matrix, 
+
+\hypertarget{model_8cu_ac4ba5a776bb9805306fec00fa0772259}{\index{model.\-cu@{model.\-cu}!set\-Model\-Matrix@{set\-Model\-Matrix}}
+\index{set\-Model\-Matrix@{set\-Model\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Model\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Model\-Matrix (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_ac4ba5a776bb9805306fec00fa0772259}
+
+
+Model Matrix. 
+
+Copies the model\-Matrix to the uniform buffer \hypertarget{model_8cu_a8547e94c714309e7882a52566964b557}{\index{model.\-cu@{model.\-cu}!set\-Rotation\-Matrix@{set\-Rotation\-Matrix}}
+\index{set\-Rotation\-Matrix@{set\-Rotation\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Rotation\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Rotation\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{mat, }
+\item[{float}]{angle, }
+\item[{float}]{x, }
+\item[{float}]{y, }
+\item[{float}]{z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a8547e94c714309e7882a52566964b557}
+
+
+Defines a transformation matrix mat with a rotation. 
+
+\hypertarget{model_8cu_a9705f0ad26d5379e263aeb4927950db8}{\index{model.\-cu@{model.\-cu}!set\-Scale\-Matrix@{set\-Scale\-Matrix}}
+\index{set\-Scale\-Matrix@{set\-Scale\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Scale\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Scale\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{mat, }
+\item[{float}]{sx, }
+\item[{float}]{sy, }
+\item[{float}]{sz}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a9705f0ad26d5379e263aeb4927950db8}
+
+
+Defines a transformation matrix mat with a scale. 
+
+\hypertarget{model_8cu_a78d7c04718261e6caa38ff87be705787}{\index{model.\-cu@{model.\-cu}!set\-Translation\-Matrix@{set\-Translation\-Matrix}}
+\index{set\-Translation\-Matrix@{set\-Translation\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{set\-Translation\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Translation\-Matrix (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{mat, }
+\item[{float}]{x, }
+\item[{float}]{y, }
+\item[{float}]{z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a78d7c04718261e6caa38ff87be705787}
+
+
+Defines a transformation matrix mat with a translation. 
+
+\hypertarget{model_8cu_a16dffda163716a857e0e767d1f35d806}{\index{model.\-cu@{model.\-cu}!setup\-Shaders@{setup\-Shaders}}
+\index{setup\-Shaders@{setup\-Shaders}!model.cu@{model.\-cu}}
+\subsubsection[{setup\-Shaders}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint setup\-Shaders (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a16dffda163716a857e0e767d1f35d806}
+\hypertarget{model_8cu_a9081ed23141a5980f028b21d58fa3290}{\index{model.\-cu@{model.\-cu}!translate@{translate}}
+\index{translate@{translate}!model.cu@{model.\-cu}}
+\subsubsection[{translate}]{\setlength{\rightskip}{0pt plus 5cm}void translate (
+\begin{DoxyParamCaption}
+\item[{float}]{x, }
+\item[{float}]{y, }
+\item[{float}]{z}
+\end{DoxyParamCaption}
+)}}\label{model_8cu_a9081ed23141a5980f028b21d58fa3290}
+
+
+The equivalent to gl\-Translate applied to the model matrix. 
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{model_8cu_ab1551d8043c2aa4410fb7dbb1fe3be7b}{\index{model.\-cu@{model.\-cu}!alpha@{alpha}}
+\index{alpha@{alpha}!model.cu@{model.\-cu}}
+\subsubsection[{alpha}]{\setlength{\rightskip}{0pt plus 5cm}float alpha = 0.\-0f}}\label{model_8cu_ab1551d8043c2aa4410fb7dbb1fe3be7b}
+
+
+Camera Spherical Coordinates. 
+
+\hypertarget{model_8cu_aa773d9a6c0ccefaa0fc9ab66fec68ec1}{\index{model.\-cu@{model.\-cu}!beta@{beta}}
+\index{beta@{beta}!model.cu@{model.\-cu}}
+\subsubsection[{beta}]{\setlength{\rightskip}{0pt plus 5cm}float beta = 0.\-0f}}\label{model_8cu_aa773d9a6c0ccefaa0fc9ab66fec68ec1}
+\hypertarget{model_8cu_a1db86c8e9928093303bdc04e7005232d}{\index{model.\-cu@{model.\-cu}!cam\-X@{cam\-X}}
+\index{cam\-X@{cam\-X}!model.cu@{model.\-cu}}
+\subsubsection[{cam\-X}]{\setlength{\rightskip}{0pt plus 5cm}float cam\-X = 0}}\label{model_8cu_a1db86c8e9928093303bdc04e7005232d}
+
+
+Camera Position. 
+
+\hypertarget{model_8cu_a1b9c52c561e9ba676e2302e9a76a1f0b}{\index{model.\-cu@{model.\-cu}!cam\-Y@{cam\-Y}}
+\index{cam\-Y@{cam\-Y}!model.cu@{model.\-cu}}
+\subsubsection[{cam\-Y}]{\setlength{\rightskip}{0pt plus 5cm}float cam\-Y = 0}}\label{model_8cu_a1b9c52c561e9ba676e2302e9a76a1f0b}
+\hypertarget{model_8cu_a174bd67f2d4b25dfc51589d53dc84c9e}{\index{model.\-cu@{model.\-cu}!cam\-Z@{cam\-Z}}
+\index{cam\-Z@{cam\-Z}!model.cu@{model.\-cu}}
+\subsubsection[{cam\-Z}]{\setlength{\rightskip}{0pt plus 5cm}float cam\-Z = 5}}\label{model_8cu_a174bd67f2d4b25dfc51589d53dc84c9e}
+\hypertarget{model_8cu_ac6199bad53ba5a784194f0d6a86a1758}{\index{model.\-cu@{model.\-cu}!fragment\-Shader@{fragment\-Shader}}
+\index{fragment\-Shader@{fragment\-Shader}!model.cu@{model.\-cu}}
+\subsubsection[{fragment\-Shader}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint fragment\-Shader}}\label{model_8cu_ac6199bad53ba5a784194f0d6a86a1758}
+\hypertarget{model_8cu_acc60f07ef610a395e60c056a6ceac291}{\index{model.\-cu@{model.\-cu}!importer@{importer}}
+\index{importer@{importer}!model.cu@{model.\-cu}}
+\subsubsection[{importer}]{\setlength{\rightskip}{0pt plus 5cm}Assimp\-::\-Importer importer}}\label{model_8cu_acc60f07ef610a395e60c056a6ceac291}
+
+
+Create an instance of the Importer class. 
+
+\hypertarget{model_8cu_a4da0b71259cea0b7a2fa5d47c9a33061}{\index{model.\-cu@{model.\-cu}!material\-Uni\-Loc@{material\-Uni\-Loc}}
+\index{material\-Uni\-Loc@{material\-Uni\-Loc}!model.cu@{model.\-cu}}
+\subsubsection[{material\-Uni\-Loc}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint material\-Uni\-Loc = 2}}\label{model_8cu_a4da0b71259cea0b7a2fa5d47c9a33061}
+\hypertarget{model_8cu_a9d18a0bfeca34c0908d4383cff3506d1}{\index{model.\-cu@{model.\-cu}!matrices\-Uni\-Buffer@{matrices\-Uni\-Buffer}}
+\index{matrices\-Uni\-Buffer@{matrices\-Uni\-Buffer}!model.cu@{model.\-cu}}
+\subsubsection[{matrices\-Uni\-Buffer}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint matrices\-Uni\-Buffer}}\label{model_8cu_a9d18a0bfeca34c0908d4383cff3506d1}
+
+
+Uniform Buffer for Matrices. 
+
+\hypertarget{model_8cu_ac02c3eda5bd826029d27c463d16e2e9d}{\index{model.\-cu@{model.\-cu}!matrices\-Uni\-Loc@{matrices\-Uni\-Loc}}
+\index{matrices\-Uni\-Loc@{matrices\-Uni\-Loc}!model.cu@{model.\-cu}}
+\subsubsection[{matrices\-Uni\-Loc}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint matrices\-Uni\-Loc = 1}}\label{model_8cu_ac02c3eda5bd826029d27c463d16e2e9d}
+
+
+Uniform Bindings Points. 
+
+\hypertarget{model_8cu_a2d79b97202d353b8484d554d4eec887a}{\index{model.\-cu@{model.\-cu}!matrix\-Stack@{matrix\-Stack}}
+\index{matrix\-Stack@{matrix\-Stack}!model.cu@{model.\-cu}}
+\subsubsection[{matrix\-Stack}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$float $\ast$$>$ matrix\-Stack}}\label{model_8cu_a2d79b97202d353b8484d554d4eec887a}
+
+
+For push and pop matrix. 
+
+\hypertarget{model_8cu_a3172941d9cdfe886976ac7aca79bdd38}{\index{model.\-cu@{model.\-cu}!model\-Matrix@{model\-Matrix}}
+\index{model\-Matrix@{model\-Matrix}!model.cu@{model.\-cu}}
+\subsubsection[{model\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}float model\-Matrix\mbox{[}16\mbox{]}}}\label{model_8cu_a3172941d9cdfe886976ac7aca79bdd38}
+
+
+Model Matrix (part of the Open\-G\-L Model View Matrix) 
+
+\hypertarget{model_8cu_a6c07ad8099da4a08eb875a7a2f98e5c1}{\index{model.\-cu@{model.\-cu}!my\-Meshes@{my\-Meshes}}
+\index{my\-Meshes@{my\-Meshes}!model.cu@{model.\-cu}}
+\subsubsection[{my\-Meshes}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$struct {\bf My\-Mesh}$>$ my\-Meshes}}\label{model_8cu_a6c07ad8099da4a08eb875a7a2f98e5c1}
+\hypertarget{model_8cu_a56e36f00ac5f661588ac29611cfce147}{\index{model.\-cu@{model.\-cu}!normal\-Loc@{normal\-Loc}}
+\index{normal\-Loc@{normal\-Loc}!model.cu@{model.\-cu}}
+\subsubsection[{normal\-Loc}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint normal\-Loc =1}}\label{model_8cu_a56e36f00ac5f661588ac29611cfce147}
+\hypertarget{model_8cu_a27d8510c93324412d38a888eddee2852}{\index{model.\-cu@{model.\-cu}!program@{program}}
+\index{program@{program}!model.cu@{model.\-cu}}
+\subsubsection[{program}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint program}}\label{model_8cu_a27d8510c93324412d38a888eddee2852}
+
+
+Program and Shader Identifiers. 
+
+\hypertarget{model_8cu_a4788d82c901b9367dd5c0daff8a7616b}{\index{model.\-cu@{model.\-cu}!r@{r}}
+\index{r@{r}!model.cu@{model.\-cu}}
+\subsubsection[{r}]{\setlength{\rightskip}{0pt plus 5cm}float r = 5.\-0f}}\label{model_8cu_a4788d82c901b9367dd5c0daff8a7616b}
+\hypertarget{model_8cu_a8030f24154c0e29bcbdf9a153804f214}{\index{model.\-cu@{model.\-cu}!scale\-Factor@{scale\-Factor}}
+\index{scale\-Factor@{scale\-Factor}!model.cu@{model.\-cu}}
+\subsubsection[{scale\-Factor}]{\setlength{\rightskip}{0pt plus 5cm}float scale\-Factor}}\label{model_8cu_a8030f24154c0e29bcbdf9a153804f214}
+
+
+scale factor for the model to fit in the window 
+
+\hypertarget{model_8cu_a7146d7f6682223a83b571071845d75e9}{\index{model.\-cu@{model.\-cu}!scene@{scene}}
+\index{scene@{scene}!model.cu@{model.\-cu}}
+\subsubsection[{scene}]{\setlength{\rightskip}{0pt plus 5cm}const ai\-Scene$\ast$ scene = N\-U\-L\-L}}\label{model_8cu_a7146d7f6682223a83b571071845d75e9}
+
+
+the global Assimp scene object 
+
+\hypertarget{model_8cu_ab6d811204eda46a18e0d5cb6182521d9}{\index{model.\-cu@{model.\-cu}!scene\-\_\-center@{scene\-\_\-center}}
+\index{scene\-\_\-center@{scene\-\_\-center}!model.cu@{model.\-cu}}
+\subsubsection[{scene\-\_\-center}]{\setlength{\rightskip}{0pt plus 5cm}ai\-Vector3\-D scene\-\_\-center}}\label{model_8cu_ab6d811204eda46a18e0d5cb6182521d9}
+\hypertarget{model_8cu_a0778234d487fcc70e8cd289ac0322799}{\index{model.\-cu@{model.\-cu}!scene\-\_\-max@{scene\-\_\-max}}
+\index{scene\-\_\-max@{scene\-\_\-max}!model.cu@{model.\-cu}}
+\subsubsection[{scene\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}ai\-Vector3\-D scene\-\_\-max}}\label{model_8cu_a0778234d487fcc70e8cd289ac0322799}
+\hypertarget{model_8cu_a52c5663b71d3f45942f9dabf61485686}{\index{model.\-cu@{model.\-cu}!scene\-\_\-min@{scene\-\_\-min}}
+\index{scene\-\_\-min@{scene\-\_\-min}!model.cu@{model.\-cu}}
+\subsubsection[{scene\-\_\-min}]{\setlength{\rightskip}{0pt plus 5cm}ai\-Vector3\-D scene\-\_\-min}}\label{model_8cu_a52c5663b71d3f45942f9dabf61485686}
+\hypertarget{model_8cu_a85da7669cabd63b0459f1335886dbf2e}{\index{model.\-cu@{model.\-cu}!start\-X@{start\-X}}
+\index{start\-X@{start\-X}!model.cu@{model.\-cu}}
+\subsubsection[{start\-X}]{\setlength{\rightskip}{0pt plus 5cm}int start\-X}}\label{model_8cu_a85da7669cabd63b0459f1335886dbf2e}
+
+
+Mouse Tracking Variables. 
+
+\hypertarget{model_8cu_a7fd8d76428f3da6360d3219bb2b9673a}{\index{model.\-cu@{model.\-cu}!start\-Y@{start\-Y}}
+\index{start\-Y@{start\-Y}!model.cu@{model.\-cu}}
+\subsubsection[{start\-Y}]{\setlength{\rightskip}{0pt plus 5cm}int start\-Y}}\label{model_8cu_a7fd8d76428f3da6360d3219bb2b9673a}
+\hypertarget{model_8cu_a1a017d1373ae220b4ec413d55eebf11c}{\index{model.\-cu@{model.\-cu}!tex\-Coord\-Loc@{tex\-Coord\-Loc}}
+\index{tex\-Coord\-Loc@{tex\-Coord\-Loc}!model.cu@{model.\-cu}}
+\subsubsection[{tex\-Coord\-Loc}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint tex\-Coord\-Loc =2}}\label{model_8cu_a1a017d1373ae220b4ec413d55eebf11c}
+\hypertarget{model_8cu_a531fe6af3b950c3a770ea91117a9b24f}{\index{model.\-cu@{model.\-cu}!texture\-Id\-Map@{texture\-Id\-Map}}
+\index{texture\-Id\-Map@{texture\-Id\-Map}!model.cu@{model.\-cu}}
+\subsubsection[{texture\-Id\-Map}]{\setlength{\rightskip}{0pt plus 5cm}std\-::map$<$std\-::string, G\-Luint$>$ texture\-Id\-Map}}\label{model_8cu_a531fe6af3b950c3a770ea91117a9b24f}
+
+
+images / texture 
+
+\hypertarget{model_8cu_a97e30e3db0b913943abcd0dc575ace53}{\index{model.\-cu@{model.\-cu}!tex\-Unit@{tex\-Unit}}
+\index{tex\-Unit@{tex\-Unit}!model.cu@{model.\-cu}}
+\subsubsection[{tex\-Unit}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint tex\-Unit = 0}}\label{model_8cu_a97e30e3db0b913943abcd0dc575ace53}
+
+
+The sampler uniform for textured models. 
+
+\hypertarget{model_8cu_af140661d5ce1ea88b9a8b74bca0a2b6e}{\index{model.\-cu@{model.\-cu}!tracking@{tracking}}
+\index{tracking@{tracking}!model.cu@{model.\-cu}}
+\subsubsection[{tracking}]{\setlength{\rightskip}{0pt plus 5cm}int tracking = 0}}\label{model_8cu_af140661d5ce1ea88b9a8b74bca0a2b6e}
+\hypertarget{model_8cu_a5711328d3ae0b85040c6b5ab7a068938}{\index{model.\-cu@{model.\-cu}!vertex\-Loc@{vertex\-Loc}}
+\index{vertex\-Loc@{vertex\-Loc}!model.cu@{model.\-cu}}
+\subsubsection[{vertex\-Loc}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint vertex\-Loc =0}}\label{model_8cu_a5711328d3ae0b85040c6b5ab7a068938}
+
+
+Vertex Attribute Locations. 
+
+\hypertarget{model_8cu_aff4cf7548dc507a02192ad289d424873}{\index{model.\-cu@{model.\-cu}!vertex\-Shader@{vertex\-Shader}}
+\index{vertex\-Shader@{vertex\-Shader}!model.cu@{model.\-cu}}
+\subsubsection[{vertex\-Shader}]{\setlength{\rightskip}{0pt plus 5cm}G\-Luint vertex\-Shader}}\label{model_8cu_aff4cf7548dc507a02192ad289d424873}

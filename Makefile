@@ -1,7 +1,7 @@
 all:	targ
 
-targ:	render.cu
-	nvcc render.cu -o render -lIL -lGL -lglut -lGLEW -lassimp `pkg-config --cflags --libs opencv`
+targ:	render.cpp
+	g++ render.cpp -o render -lIL -lGL -lglut -lGLEW -lassimp -lopencv_core -lopencv_highgui
 
 clean:
 	rm -f render
