@@ -15,7 +15,12 @@ echo "##########################################################################
 # rendering
 mkdir -p output/$OBJ
 \rm -rf output/$OBJ/*
-./render ./input/$CAD_FILENAME output/$OBJ   10 15  1   3  6  1 # Rx 15 Ry 10 Rz 0
+./render ./input/$CAD_FILENAME output/$OBJ   10 15 10  3  3  36 -1 0 -1 # Rx 15 Ry 10 Rz 0
+
+# copy renders for training
+mkdir -p ../vncc_train/input/$OBJ
+\rm -rf ../vncc_train/input/$OBJ/*
+cp output/$OBJ/template*.* ../vncc_train/input/$OBJ
 
 # copy renders for training
 mkdir -p ../vncc_train/input/$OBJ
@@ -23,20 +28,20 @@ mkdir -p ../vncc_train/input/$OBJ
 cp output/$OBJ/template*.* ../vncc_train/input/$OBJ
 
 # copy renders for testing
-mkdir -p ../realtime_vncc/models/$OBJ
-\rm -rf ../realtime_vncc/models/$OBJ/*
-cp output/$OBJ/template*.* ../realtime_vncc/models/$OBJ
+mkdir -p ../realtime_vncc/models/kinect_v1/$OBJ
+\rm -rf ../realtime_vncc/models/kinect_v1/$OBJ/*
+cp output/$OBJ/template*.* ../realtime_vncc/models/kinect_v1/$OBJ
 
 # train
 echo "################################################################################"
-echo "training ../vncc_train/input/$OBJ renders will be trained to ../vncc_train/output/$OBJ and made into ../vncc_train/pre/$OBJ.yaml"
-echo "  YAML file will be copied to ../realtime_vncc/pre"
+echo "training ../vncc_train/input/$OBJ renders will be trained to ../vncc_train/output/$OBJ and made into ../vncc_train/pre/$OBJ.yml"
+echo "  yml file will be copied to ../realtime_vncc/pre"
 echo "################################################################################"
 cd ../vncc_train
 mkdir -p ../vncc_train/output/$OBJ
 \rm -rf ../output/$OBJ/*
-\rm -rf ../pre/$OBJ.yaml
-./train ./input/$OBJ ./output/$OBJ ./pre/$OBJ.yaml
+\rm -rf ../pre/$OBJ.yml
+./train ./input/$OBJ ./output/$OBJ ./pre/$OBJ.yml 324 80
 
-# copy yaml for testing
-cp ./pre/$OBJ.yaml ../realtime_vncc/pre
+# copy yml for testing
+cp ./pre/$OBJ.yml ../realtime_vncc/pre/kinect_v1

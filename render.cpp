@@ -37,9 +37,9 @@ float gvar_proj_mtx_near_clip_plane, gvar_proj_mtx_far_clip_plane;
 int gvar_render_size_width, gvar_render_size_height;
 
 /// params for model -- default values below, can be overridden
-#define MODEL_FILENAME "./input/17_Pet_bottle_pet_tea.ply"
+//#define MODEL_FILENAME "./input/17_Pet_bottle_pet_tea.ply"
 //#define MODEL_FILENAME "./input/19_Dish_bawl_rice.ply"
-//#define MODEL_FILENAME "./input/14_MugCup_green.ply"
+#define MODEL_FILENAME "./input/14_MugCup_green.ply"
 //#define MODEL_FILENAME "./input/arc.obj" // this can be OBJ or PLY (may be others work as well)
 #define OUTPUT_DIR "output"
 
@@ -748,8 +748,8 @@ void recursive_render (const aiScene *sc, const aiNode* nd)
 void renderScene(void) {
 
   int i,j,k,ctr = 0;
-  for(i=0;i<gvar_num_rot_x;i++){ // @todo, why does this start at -1 but others start at 0?  affects exit condition of loop
-    for(j=0;j<gvar_num_rot_y;j++){
+  for(i=-1;i<gvar_num_rot_x-1;i++){ // @todo, why does this start at -1 but others start at 0?  affects exit condition of loop
+    for(j=1;j<gvar_num_rot_y+1;j++){
       for(k=0;k<gvar_num_rot_z;k++){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
